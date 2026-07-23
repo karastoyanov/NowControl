@@ -71,6 +71,13 @@ func initConfig() {
 	}
 }
 
+// SetVersionInfo sets the version string reported by `nowctl --version`,
+// populated by goreleaser's ldflags at build time (defaults to "dev" for
+// local `go build`).
+func SetVersionInfo(version, commit, date string) {
+	rootCmd.Version = fmt.Sprintf("%s (commit %s, built %s)", version, commit, date)
+}
+
 // configFilePath returns the config file location that a command should
 // write to: the explicit --config path if given, otherwise $HOME/.nowctl.yaml.
 func configFilePath() string {

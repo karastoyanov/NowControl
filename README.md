@@ -17,16 +17,30 @@ all from the terminal, on Windows, Linux, and macOS.
 
 ## Installation
 
+Download the archive for your platform from the
+[latest release](https://github.com/karastoyanov/NowControl/releases/latest),
+extract it, and move the `nowctl` binary onto your `PATH`.
+
+```bash
+# macOS (Apple Silicon) example — swap in your OS/arch as needed
+curl -LO https://github.com/karastoyanov/NowControl/releases/latest/download/nowctl_<version>_darwin_arm64.tar.gz
+tar -xzf nowctl_<version>_darwin_arm64.tar.gz
+sudo mv nowctl /usr/local/bin/
+nowctl --version
+```
+
+Windows/Linux users: download the matching `.zip`/`.tar.gz` from the
+releases page and put `nowctl`(`.exe`) anywhere on `%PATH%`/`$PATH`.
+
+### Build from source
+
 Requires [Go](https://go.dev) 1.26+.
 
 ```bash
-git clone https://github.com/karastoyanov/nowcontrol.git
-cd nowcontrol
+git clone https://github.com/karastoyanov/NowControl.git
+cd NowControl
 go build -o nowctl .
 ```
-
-Move the resulting `nowctl` binary onto your `PATH` (e.g. `/usr/local/bin`
-on macOS/Linux, or any directory in `%PATH%` on Windows).
 
 ## Quick start
 
