@@ -30,18 +30,30 @@ brew install nowctl
 brew upgrade nowctl
 ```
 
-### Debian/Ubuntu (.deb)
+### Debian/Ubuntu (apt repository)
 
-Download the `.deb` for your architecture from the
-[latest release](https://github.com/karastoyanov/NowControl/releases/latest):
+A self-hosted apt repository is published on every release, so `apt`
+handles install/upgrade/removal like any other package:
 
 ```bash
-curl -LO https://github.com/karastoyanov/NowControl/releases/latest/download/nowctl_<version>_linux_amd64.deb
-sudo apt install ./nowctl_<version>_linux_amd64.deb
+curl -fsSL https://karastoyanov.github.io/NowControl/nowctl-archive-keyring.asc \
+  | sudo gpg --dearmor -o /usr/share/keyrings/nowctl-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/nowctl-archive-keyring.gpg] https://karastoyanov.github.io/NowControl stable main" \
+  | sudo tee /etc/apt/sources.list.d/nowctl.list
+sudo apt update
+sudo apt install nowctl
 
-# to update later: download the new .deb and repeat the apt install command;
-# to remove: sudo apt remove nowctl
+# to update later:
+sudo apt update && sudo apt upgrade nowctl
+
+# to remove:
+sudo apt remove nowctl
 ```
+
+Prefer a one-off install without adding a repo? Download the `.deb`
+directly from the [latest release](https://github.com/karastoyanov/NowControl/releases/latest)
+and `sudo apt install ./nowctl_<version>_linux_<arch>.deb` — but then
+you're back to manually re-downloading for updates.
 
 ### Manual (any platform)
 
@@ -110,6 +122,26 @@ go build -o nowctl .   # build
 go vet ./...           # static checks
 gofmt -l .             # formatting check
 ```
+
+### Release process
+
+Pushing a `vX.Y.Z` tag triggers `.github/workflows/release.yml`:
+
+1. **goreleaser** builds archives for all platforms, `.deb` packages, and
+   the GitHub Release (with a custom header/footer -- edit `release.header`/
+   `release.footer` in `.goreleaser.yaml` for per-version notes), and pushes
+   a Homebrew formula to this repo's `homebrew` branch.
+2. **apt-repo** downloads the `.deb` assets just published, rebuilds the
+   apt repository with `aptly` (re-importing every previously published
+   `.deb` from `gh-pages/pool` first, so old versions stay installable),
+   signs it with the `APT_GPG_PRIVATE_KEY` secret, and pushes the result to
+   the `gh-pages` branch, served at https://karastoyanov.github.io/NowControl/.
+
+The apt-signing key is a dedicated, passphrase-less keypair used only for
+this repo -- not anyone's personal GPG identity. To rotate it: generate a
+new key, update the `APT_GPG_PRIVATE_KEY` secret, and republish
+`nowctl-archive-keyring.asc` on `gh-pages` (existing users need to re-run
+the `curl | gpg --dearmor` step from the install instructions).
 
 ## Project layout
 

@@ -27,3 +27,72 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  apt-repo:
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Download release .deb assets
+        run: gh release download "${{ github.ref_name }}" --repo "${{ github.repository }}" --pattern "*.deb" --dir debs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install aptly
+        run: |
+          curl -fsSL -o aptly.zip https://github.com/aptly-dev/aptly/releases/download/v1.6.3/aptly_1.6.3_linux_amd64.zip
+          unzip -q aptly.zip
+          sudo mv aptly_1.6.3_linux_amd64/aptly /usr/local/bin/aptly
+
+      - name: Import signing key
+        run: |
+          echo "${{ secrets.APT_GPG_PRIVATE_KEY }}" | gpg --batch --import
+          echo "APT_GPG_KEYID=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec/ {print $5; exit}')" >> "$GITHUB_ENV"
+
+      - name: Build and publish apt repository
+        run: |
+          mkdir -p aptly-root
+          cat > aptly.conf <<CONF
+          {
+            "rootDir": "$PWD/aptly-root",
+            "gpgProvider": "gpg",
+            "FileSystemPublishEndpoints": {
+              "gh-pages": { "rootDir": "$PWD/gh-pages", "linkMethod": "copy" }
+            }
+          }
+          CONF
+
+          aptly -config=aptly.conf repo create -distribution=stable -component=main nowctl
+
+          # re-import previously published packages so old versions stay installable
+          if [ -d gh-pages/pool ]; then
+            find gh-pages/pool -name '*.deb' -exec aptly -config=aptly.conf repo add nowctl {} \;
+          fi
+
+          aptly -config=aptly.conf repo add nowctl debs/
+
+          aptly -config=aptly.conf snapshot create "nowctl-${{ github.ref_name }}" from repo nowctl
+
+          aptly -config=aptly.conf publish snapshot \
+            -distribution=stable -component=main \
+            -gpg-key="$APT_GPG_KEYID" -batch \
+            "nowctl-${{ github.ref_name }}" filesystem:gh-pages:.
+
+      - name: Publish signing public key
+        run: gpg --armor --export "$APT_GPG_KEYID" > gh-pages/nowctl-archive-keyring.asc
+
+      - name: Commit and push gh-pages
+        working-directory: gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Publish apt repo for ${{ github.ref_name }}"
+          git push origin gh-pages
