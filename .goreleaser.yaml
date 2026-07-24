@@ -34,6 +34,16 @@ archives:
       - LICENSE
       - README.md
 
+nfpms:
+  - id: nowctl
+    package_name: nowctl
+    formats:
+      - deb
+    maintainer: Aleksandar Karastoyanov <karastoqnov.alexandar@gmail.com>
+    homepage: https://github.com/karastoyanov/NowControl
+    description: Cross-platform command-line interface for ServiceNow
+    license: GPL-3.0
+
 checksum:
   name_template: "checksums.txt"
 
@@ -48,3 +58,41 @@ release:
   github:
     owner: karastoyanov
     name: NowControl
+  header: |
+    ## nowctl v{{ .Version }}
+
+    **Breaking change:** credentials are now stored in the config file
+    (`~/.nowctl.yaml`, permissions locked to owner-only `0600`) instead of
+    the OS keychain -- this removes the D-Bus/Secret Service dependency
+    that broke `auth login` on headless Linux (VMs, containers, CI). If
+    you were logged in with a previous version, run `nowctl auth login`
+    again after upgrading; the old keychain entry won't be picked up.
+
+    **New:**
+    - Table aliases (`nowctl alias set/list/remove`) -- define short names
+      for long table names, usable anywhere a `<table>` argument is
+      expected, e.g. `nowctl alias set computer cmdb_ci_computer`
+    - `--verbose` flag -- diagnostic output (e.g. "Using config file: ...")
+      is quiet by default now
+    - `.deb` packages and a Homebrew tap for easier install/upgrade
+  footer: |
+    ---
+    Full usage reference: [docs/USAGE.md](https://github.com/karastoyanov/NowControl/blob/v{{ .Version }}/docs/USAGE.md)
+
+brews:
+  - name: nowctl
+    repository:
+      owner: karastoyanov
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: Aleksandar Karastoyanov
+      email: karastoqnov.alexandar@gmail.com
+    homepage: https://github.com/karastoyanov/NowControl
+    description: Cross-platform command-line interface for ServiceNow
+    license: GPL-3.0
+    install: |
+      bin.install "nowctl"
+    test: |
+      system "#{bin}/nowctl --version"
