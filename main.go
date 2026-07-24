@@ -18,14 +18,13 @@ package main
 
 import "github.com/karastoyanov/nowcontrol/cmd"
 
-// version, commit, and date are set via -ldflags at build time by goreleaser.
+// version and date are set via -ldflags at build time by goreleaser.
 var (
 	version = "dev"
-	commit  = "none"
 	date    = "unknown"
 )
 
 func main() {
-	cmd.SetVersionInfo(version, commit, date)
+	cmd.SetVersionInfo(version, date)
 	cmd.Execute()
 }

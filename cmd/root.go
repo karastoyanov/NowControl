@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -80,8 +81,19 @@ func initConfig() {
 // SetVersionInfo sets the version string reported by `nowctl --version`,
 // populated by goreleaser's ldflags at build time (defaults to "dev" for
 // local `go build`).
-func SetVersionInfo(version, commit, date string) {
-	rootCmd.Version = fmt.Sprintf("%s (commit %s, built %s)", version, commit, date)
+func SetVersionInfo(version, date string) {
+	rootCmd.Version = fmt.Sprintf("%s (built %s)", version, formatBuildDate(date))
+}
+
+// formatBuildDate reformats goreleaser's RFC3339 build date into dd-MM-yyyy,
+// falling back to the raw value (e.g. "unknown" for local go build) if it
+// doesn't parse.
+func formatBuildDate(date string) string {
+	t, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return date
+	}
+	return t.Format("02-01-2006")
 }
 
 // configFilePath returns the config file location that a command should
