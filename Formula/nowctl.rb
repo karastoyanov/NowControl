@@ -5,21 +5,21 @@
 class Nowctl < Formula
   desc "Cross-platform command-line interface for ServiceNow"
   homepage "https://github.com/karastoyanov/NowControl"
-  version "0.3.1"
+  version "0.3.2"
   license "GPL-3.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.1/nowctl_0.3.1_darwin_amd64.tar.gz"
-      sha256 "83e013a112af13302a6183c0242f8ccf658d560c96e2e8d271fe5d876bb27a7f"
+      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.2/nowctl_0.3.2_darwin_amd64.tar.gz"
+      sha256 "2fa1ebe26443e7cc6a3d66c820eaca76a0de388be4e7f9247cad7487d86efec5"
 
       define_method(:install) do
         bin.install "nowctl"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.1/nowctl_0.3.1_darwin_arm64.tar.gz"
-      sha256 "6e0588950dd92b33c6b8c6b937248986a24b454c634dc6c05a0a169d9d6f62af"
+      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.2/nowctl_0.3.2_darwin_arm64.tar.gz"
+      sha256 "f083b3759da877b6846cd828f213575e85a69fa9f53ef24cd1789fffef524114"
 
       define_method(:install) do
         bin.install "nowctl"
@@ -29,15 +29,15 @@ class Nowctl < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.1/nowctl_0.3.1_linux_amd64.tar.gz"
-      sha256 "a37513ae04f8b4765010cd9fdca26273bd545b44f9f258cb388854ffb2e8ca88"
+      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.2/nowctl_0.3.2_linux_amd64.tar.gz"
+      sha256 "bb2e1dc82f00f62f3ed1a859d4d73eb5b1fbd4494946fc520c09d72bc33b806c"
       define_method(:install) do
         bin.install "nowctl"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.1/nowctl_0.3.1_linux_arm64.tar.gz"
-      sha256 "4bc1053963c0a348c4908e39a865f3c4d5a562d478b78d8e9c0ff8ece48a174b"
+      url "https://github.com/karastoyanov/NowControl/releases/download/v0.3.2/nowctl_0.3.2_linux_arm64.tar.gz"
+      sha256 "2a3c79d57fb814f8bc9384f42a576df3556082a03e24ea11ae2feb4b54ce77be"
       define_method(:install) do
         bin.install "nowctl"
       end
