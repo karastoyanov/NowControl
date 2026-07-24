@@ -73,6 +73,29 @@ nowctl table list incident --limit 25 --query "active=true"
 nowctl table list incident --fields "number,short_description,state" --format csv
 ```
 
+### `nowctl table describe <table>`
+
+Lists a table's fields via `sys_dictionary`, including fields inherited
+from parent tables in the class hierarchy (e.g. `incident` inherits
+`number`, `short_description`, `state`, etc. from `task`) -- resolved by
+walking `sys_db_object.super_class`.
+
+Each field's `internal_type` and `reference` are shown as display values
+(e.g. `Reference`, `Configuration Item`) rather than raw sys_ids.
+
+| Flag | Description |
+|---|---|
+| `--format` | `json` (default), `csv`, `xml`, `xlsx` |
+| `--output` | Write to this file instead of stdout (required for `xlsx`) |
+
+```bash
+nowctl table describe incident
+nowctl table describe incident --format csv
+```
+
+Requires read access to `sys_dictionary` and `sys_db_object`; some
+ServiceNow roles restrict these, which surfaces as a `403` error.
+
 ### `nowctl record get <table> <sys_id>`
 
 Fetches a single record via `GET /api/now/table/{table}/{sys_id}`.
@@ -148,6 +171,20 @@ nowctl record delete incident <sys_id> --yes     # no prompt
 When stdin isn't a terminal (piped/scripted) and `--yes` isn't passed,
 the command errors immediately instead of hanging on a prompt no one can
 answer.
+
+### `nowctl doctor`
+
+Checks, in order: the config file (exists? permissions `0600`?), the
+resolved instance and username, whether a password is stored for that
+pair, and finally live authentication via `GET /api/now/table/sys_user`
+(the same call `auth login` uses to verify credentials). Prints an
+`OK`/`FAIL` line per check and exits non-zero if anything failed --
+handy for scripting or just confirming a fresh setup works before
+running real commands.
+
+```bash
+nowctl doctor
+```
 
 ## Export formats
 

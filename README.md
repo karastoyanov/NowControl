@@ -7,6 +7,8 @@ all from the terminal, on Windows, Linux, and macOS.
 ## Features
 
 - **Table queries** — list records from any table with ServiceNow query syntax
+- **Schema discovery** — `table describe` lists a table's fields, types, and
+  reference targets, including fields inherited from parent tables
 - **Record CRUD** — get, create, update, and delete individual records by `sys_id`
 - **Export** — JSON, CSV, XML, or XLSX, to stdout or a file
 - **Credentials** — passwords are verified against the instance, then stored
@@ -15,6 +17,8 @@ all from the terminal, on Windows, Linux, and macOS.
   a container, or a desktop
 - **Zero-flag workflow** — log in once and the instance/username are
   remembered; only the command itself is needed afterwards
+- **`nowctl doctor`** — checks config, stored credentials, and live
+  connectivity/authentication against the instance in one command
 - **Table aliases** — define short names for long table names (e.g. `computer`
   for `cmdb_ci_computer`); usable anywhere a `<table>` argument is expected
 
