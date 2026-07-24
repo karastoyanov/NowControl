@@ -89,6 +89,9 @@ func (c *Client) request(method, requestURL string, body []byte) (json.RawMessag
 	if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("servicenow API error (%d): %s", resp.StatusCode, string(respBody))
 	}
+	if len(respBody) == 0 {
+		return nil, nil
+	}
 
 	var env envelope
 	if err := json.Unmarshal(respBody, &env); err != nil {
@@ -158,6 +161,12 @@ func (c *Client) Update(table, sysID string, fields map[string]any) (map[string]
 		return nil, fmt.Errorf("decoding record: %w", err)
 	}
 	return record, nil
+}
+
+// Delete removes a record identified by sys_id.
+func (c *Client) Delete(table, sysID string) error {
+	_, err := c.request(http.MethodDelete, c.tableURL(table, sysID, nil), nil)
+	return err
 }
 
 // Ping performs a lightweight request to verify the credentials/instance are valid.

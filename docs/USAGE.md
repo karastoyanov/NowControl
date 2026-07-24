@@ -79,6 +79,65 @@ nowctl record get incident 1c741bd70b2322007518478d83673af3
 JSON output is array-wrapped (`[{...}]`), consistent with `table list` and
 the tabular formats.
 
+### `nowctl record create <table>`
+
+Creates a record via `POST /api/now/table/{table}`.
+
+| Flag | Description |
+|---|---|
+| `--field key=value` | A single field (repeatable) |
+| `--data '<json>'` | Inline JSON object of fields |
+| `--file <path.json>` | JSON file of fields |
+| `--format` | `json` (default), `csv`, `xml`, `xlsx` |
+| `--output` | Write to this file instead of stdout (required for `xlsx`) |
+
+`--field`, `--data`, and `--file` can be combined; on a key conflict,
+later wins in this order: `--file` → `--data` → `--field`. At least one
+must be given.
+
+```bash
+nowctl record create incident --field short_description="VPN down" --field priority=1
+nowctl record create incident --data '{"short_description":"VPN down","priority":"1"}'
+nowctl record create incident --file new-incident.json
+```
+
+The created record's `sys_id` is printed to stderr as confirmation, and
+the record itself is written via `--format`/`--output` like `record get`.
+
+### `nowctl record update <table> <sys_id>`
+
+Patches a record via `PATCH /api/now/table/{table}/{sys_id}`, updating
+only the fields supplied — everything else on the record is left alone.
+Takes the same `--field`/`--data`/`--file` and `--format`/`--output`
+flags as `record create`.
+
+```bash
+nowctl record update incident <sys_id> --field state=2 --field work_notes="picked up"
+```
+
+Note: journal fields like `work_notes` and `comments` are write-only
+through the Table API — you can set them here, but reading them back via
+`record get`/`table list` returns empty (ServiceNow stores the actual
+entries in a separate journal table).
+
+### `nowctl record delete <table> <sys_id>`
+
+Deletes a record via `DELETE /api/now/table/{table}/{sys_id}`. This is
+destructive and irreversible.
+
+| Flag | Description |
+|---|---|
+| `--yes` / `-y` | Skip the confirmation prompt |
+
+```bash
+nowctl record delete incident <sys_id>          # prompts "Delete incident record <sys_id>? [y/N]"
+nowctl record delete incident <sys_id> --yes     # no prompt
+```
+
+When stdin isn't a terminal (piped/scripted) and `--yes` isn't passed,
+the command errors immediately instead of hanging on a prompt no one can
+answer.
+
 ## Export formats
 
 All export-capable commands share `--format`/`--output`:

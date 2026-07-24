@@ -7,7 +7,7 @@ all from the terminal, on Windows, Linux, and macOS.
 ## Features
 
 - **Table queries** — list records from any table with ServiceNow query syntax
-- **Record lookup** — fetch a single record by `sys_id`
+- **Record CRUD** — get, create, update, and delete individual records by `sys_id`
 - **Export** — JSON, CSV, XML, or XLSX, to stdout or a file
 - **Secure credentials** — passwords are verified against the instance, then
   stored in the OS credential store (Keychain / Credential Manager / Secret
@@ -54,11 +54,16 @@ nowctl table list incident --limit 10
 nowctl table list incident --query "active=true^priority=1"
 nowctl record get incident <sys_id>
 
-# 3. Export instead of printing JSON
+# 3. Create, update, delete
+nowctl record create incident --field short_description="VPN down" --field priority=1
+nowctl record update incident <sys_id> --field state=2
+nowctl record delete incident <sys_id>
+
+# 4. Export instead of printing JSON
 nowctl table list incident --format csv --output incidents.csv
 nowctl table list incident --format xlsx --output incidents.xlsx
 
-# 4. Remove stored credentials
+# 5. Remove stored credentials
 nowctl auth logout
 ```
 
