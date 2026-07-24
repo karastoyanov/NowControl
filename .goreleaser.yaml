@@ -61,20 +61,19 @@ release:
   header: |
     ## nowctl v{{ .Version }}
 
-    **Breaking change:** credentials are now stored in the config file
-    (`~/.nowctl.yaml`, permissions locked to owner-only `0600`) instead of
-    the OS keychain -- this removes the D-Bus/Secret Service dependency
-    that broke `auth login` on headless Linux (VMs, containers, CI). If
-    you were logged in with a previous version, run `nowctl auth login`
-    again after upgrading; the old keychain entry won't be picked up.
+    Install/update tooling improvements only -- no CLI behavior changes in
+    this release.
 
     **New:**
-    - Table aliases (`nowctl alias set/list/remove`) -- define short names
-      for long table names, usable anywhere a `<table>` argument is
-      expected, e.g. `nowctl alias set computer cmdb_ci_computer`
-    - `--verbose` flag -- diagnostic output (e.g. "Using config file: ...")
-      is quiet by default now
-    - `.deb` packages and a Homebrew tap for easier install/upgrade
+    - Self-hosted, signed apt repository -- `apt install`/`apt upgrade`
+      now works for real instead of manually re-downloading a `.deb` each
+      time. See the [Debian/Ubuntu install instructions](https://github.com/karastoyanov/NowControl#installation).
+
+    **Changed:**
+    - The Homebrew formula now lives in this repo (`homebrew` branch)
+      instead of a separate `homebrew-tap` repo. Install is now a
+      two-step tap: `brew tap karastoyanov/nowctl https://github.com/karastoyanov/NowControl && brew install nowctl`.
+      Already-tapped users: re-tap with that command, then `brew upgrade nowctl`.
   footer: |
     ---
     Full usage reference: [docs/USAGE.md](https://github.com/karastoyanov/NowControl/blob/v{{ .Version }}/docs/USAGE.md)
