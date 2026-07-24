@@ -23,7 +23,8 @@ all from the terminal, on Windows, Linux, and macOS.
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install karastoyanov/tap/nowctl
+brew tap karastoyanov/nowctl https://github.com/karastoyanov/NowControl
+brew install nowctl
 
 # to update later:
 brew upgrade nowctl

@@ -83,9 +83,10 @@ brews:
   - name: nowctl
     repository:
       owner: karastoyanov
-      name: homebrew-tap
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      name: NowControl
+      branch: homebrew
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    directory: Formula
     commit_author:
       name: Aleksandar Karastoyanov
       email: karastoqnov.alexandar@gmail.com
