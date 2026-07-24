@@ -4,6 +4,22 @@ Section:
 Installed-Size: 11392
 Maintainer: Aleksandar Karastoyanov <karastoqnov.alexandar@gmail.com>
 Architecture: arm64
+Version: 0.3.1
+Filename: pool/main/n/nowctl/nowctl_0.3.1_linux_arm64.deb
+Size: 4588680
+MD5sum: c22d6e02f953dcdecc7d3671706c3d6b
+SHA1: ab9ce3fe5e35641ff0b097ad4a4fb303fe34ce93
+SHA256: 558e4e08cc09de635b3308a424228c077a1e15f8c05deeb1f1f8b34e051226c6
+SHA512: 3225b983c32d0b658707c437ca3e91925b5f934b821e12b2a1234dbfb95107f1ec1b01c16582b440f6c8301e905d0379629262596560f57f74301b8c396f32d5
+Description: Cross-platform command-line interface for ServiceNow
+Homepage: https://github.com/karastoyanov/NowControl
+
+Package: nowctl
+Priority: optional
+Section: 
+Installed-Size: 11392
+Maintainer: Aleksandar Karastoyanov <karastoqnov.alexandar@gmail.com>
+Architecture: arm64
 Version: 0.3.0
 Filename: pool/main/n/nowctl/nowctl_0.3.0_linux_arm64.deb
 Size: 4588682
