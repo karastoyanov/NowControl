@@ -61,19 +61,13 @@ release:
   header: |
     ## nowctl v{{ .Version }}
 
-    Install/update tooling improvements only -- no CLI behavior changes in
-    this release.
-
-    **New:**
-    - Self-hosted, signed apt repository -- `apt install`/`apt upgrade`
-      now works for real instead of manually re-downloading a `.deb` each
-      time. See the [Debian/Ubuntu install instructions](https://github.com/karastoyanov/NowControl#installation).
+    Small cosmetic fix -- no functional CLI changes.
 
     **Changed:**
-    - The Homebrew formula now lives in this repo (`homebrew` branch)
-      instead of a separate `homebrew-tap` repo. Install is now a
-      two-step tap: `brew tap karastoyanov/nowctl https://github.com/karastoyanov/NowControl && brew install nowctl`.
-      Already-tapped users: re-tap with that command, then `brew upgrade nowctl`.
+    - `--version` output simplified: drops the commit hash and reformats
+      the build date from RFC3339 to `dd-MM-yyyy`, e.g.
+      `nowctl version {{ .Version }} (built 25-07-2026)` instead of
+      `nowctl version {{ .Version }} (commit abc1234..., built 2026-07-25T10:00:00Z)`.
   footer: |
     ---
     Full usage reference: [docs/USAGE.md](https://github.com/karastoyanov/NowControl/blob/v{{ .Version }}/docs/USAGE.md)
