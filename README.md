@@ -9,17 +9,45 @@ all from the terminal, on Windows, Linux, and macOS.
 - **Table queries** — list records from any table with ServiceNow query syntax
 - **Record CRUD** — get, create, update, and delete individual records by `sys_id`
 - **Export** — JSON, CSV, XML, or XLSX, to stdout or a file
-- **Secure credentials** — passwords are verified against the instance, then
-  stored in the OS credential store (Keychain / Credential Manager / Secret
-  Service) — never written to disk in plaintext
+- **Credentials** — passwords are verified against the instance, then stored
+  in the config file (`$HOME/.nowctl.yaml`, permissions locked to owner-only)
+  — no OS keychain dependency, so it works the same on a headless Linux VM,
+  a container, or a desktop
 - **Zero-flag workflow** — log in once and the instance/username are
   remembered; only the command itself is needed afterwards
+- **Table aliases** — define short names for long table names (e.g. `computer`
+  for `cmdb_ci_computer`); usable anywhere a `<table>` argument is expected
 
 ## Installation
 
+### Homebrew (macOS/Linux)
+
+```bash
+brew install karastoyanov/tap/nowctl
+
+# to update later:
+brew upgrade nowctl
+```
+
+### Debian/Ubuntu (.deb)
+
+Download the `.deb` for your architecture from the
+[latest release](https://github.com/karastoyanov/NowControl/releases/latest):
+
+```bash
+curl -LO https://github.com/karastoyanov/NowControl/releases/latest/download/nowctl_<version>_linux_amd64.deb
+sudo apt install ./nowctl_<version>_linux_amd64.deb
+
+# to update later: download the new .deb and repeat the apt install command;
+# to remove: sudo apt remove nowctl
+```
+
+### Manual (any platform)
+
 Download the archive for your platform from the
 [latest release](https://github.com/karastoyanov/NowControl/releases/latest),
-extract it, and move the `nowctl` binary onto your `PATH`.
+extract it, and move the `nowctl` binary onto your `PATH`. To update,
+repeat these steps with the new version's archive.
 
 ```bash
 # macOS (Apple Silicon) example — swap in your OS/arch as needed
@@ -45,8 +73,8 @@ go build -o nowctl .
 ## Quick start
 
 ```bash
-# 1. Authenticate once — verifies credentials, stores the password in the
-#    OS credential store, and remembers the instance/username in ~/.nowctl.yaml
+# 1. Authenticate once — verifies credentials, then stores instance,
+#    username, and password in ~/.nowctl.yaml (permissions locked to owner-only)
 nowctl auth login --instance dev12345.service-now.com --username admin
 
 # 2. Everything else needs no flags
@@ -63,7 +91,11 @@ nowctl record delete incident <sys_id>
 nowctl table list incident --format csv --output incidents.csv
 nowctl table list incident --format xlsx --output incidents.xlsx
 
-# 5. Remove stored credentials
+# 5. Alias long table names for less typing
+nowctl alias set computer cmdb_ci_computer
+nowctl table list computer --limit 5
+
+# 6. Remove stored credentials
 nowctl auth logout
 ```
 
@@ -82,7 +114,6 @@ gofmt -l .             # formatting check
 
 ```
 cmd/              Cobra command definitions (CLI surface)
-internal/auth/    OS credential store integration (go-keyring)
 internal/client/  ServiceNow Table API client (GET/POST/PATCH)
 internal/export/  JSON/CSV/XML/XLSX renderers
 ```

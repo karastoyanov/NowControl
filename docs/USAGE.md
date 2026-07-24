@@ -3,8 +3,8 @@
 ## Configuration
 
 `nowctl` needs two things for every ServiceNow request: an **instance**
-and a **username** (the password is resolved separately, via the OS
-credential store). These are resolved in order, highest priority first:
+and a **username** (the password is resolved separately, from the config
+file). These are resolved in order, highest priority first:
 
 1. `--instance` / `--username` flags
 2. `NOWCTL_INSTANCE` / `NOWCTL_USERNAME` environment variables
@@ -15,6 +15,10 @@ credential store). These are resolved in order, highest priority first:
 `nowctl auth login` writes the config file for you (see below), so in
 practice you set instance/username once and never pass them again.
 
+Pass `--verbose` on any command to print diagnostic info, such as which
+config file was loaded — this is suppressed by default to keep output
+quiet.
+
 ## Authentication
 
 ```bash
@@ -23,13 +27,19 @@ nowctl auth login --instance dev12345.service-now.com --username admin
 
 This prompts for a password (hidden input on a terminal), verifies it by
 calling the instance (`GET /api/now/table/sys_user?sysparm_limit=1`), and
-only then:
-
-- stores the password in the OS credential store — Keychain on macOS,
-  Credential Manager on Windows, Secret Service (D-Bus) on Linux
-- writes `instance` and `username` to the config file
+only then writes `instance`, `username`, and the password to the config
+file (default `$HOME/.nowctl.yaml`), locking its permissions down to
+owner-only read/write (`0600`) since it now holds a secret.
 
 Nothing is written if authentication fails.
+
+The password is stored in plaintext, protected only by that file
+permission (and whatever disk encryption your OS provides) — there's no
+OS keychain involved, by design: it needs to work the same on a headless
+Linux VM, a container, or CI, none of which reliably have a D-Bus session
+or Secret Service provider available. Treat `~/.nowctl.yaml` like any
+other credentials file (e.g. `~/.aws/credentials`, `~/.netrc`) — don't
+commit it, don't copy it around loosely.
 
 ```bash
 nowctl auth logout [--instance ... --username ...]
@@ -39,9 +49,10 @@ Removes the stored password for the given (or configured) instance and
 username. It does not remove the config file's `instance`/`username`
 values.
 
-Credentials are stored per `instance|username` pair, so you can be logged
-into multiple instances/users at once — just pass `--instance`/`--username`
-to switch between them (or log in again to update the default).
+Credentials are stored per `instance|username` pair under `credentials:`
+in the config file, so you can be logged into multiple instances/users at
+once — just pass `--instance`/`--username` to switch between them (or log
+in again to update the default).
 
 ## Commands
 
@@ -159,11 +170,45 @@ nowctl table list incident --format xlsx --output incidents.xlsx
 nowctl table list incident --format xml | less
 ```
 
+## Table aliases
+
+Long CMDB table names like `cmdb_ci_linux_server` get tedious to type.
+Aliases give them a short name, stored under `aliases` in the config file
+(default `$HOME/.nowctl.yaml`) alongside `instance`/`username`.
+
+```bash
+nowctl alias set computer cmdb_ci_computer
+nowctl alias set linux_server cmdb_ci_linux_server
+nowctl alias list
+nowctl alias remove linux_server
+```
+
+Once set, an alias can be used wherever a `<table>` argument is expected —
+`table list`, `record get/create/update/delete`:
+
+```bash
+nowctl table list computer --limit 5
+nowctl record get computer <sys_id>
+```
+
+The command prints `Resolved alias "computer" -> "cmdb_ci_computer"` to
+stderr so it's clear which real table a command actually ran against.
+
+You can also edit the config file directly:
+
+```yaml
+instance: dev12345.service-now.com
+username: admin
+aliases:
+  computer: cmdb_ci_computer
+  linux_server: cmdb_ci_linux_server
+```
+
 ## Troubleshooting
 
 **`Error: no stored credentials for <instance> (<username>): run nowctl auth login`**
 The instance/username resolved (from flags/env/config) don't have a
-password in the credential store yet. Run `auth login` for that exact
+password in the config file yet. Run `auth login` for that exact
 instance/username pair.
 
 **`Error: --format xlsx requires --output <file>...`**
@@ -175,6 +220,7 @@ Pass `--output <path>.xlsx`.
 and password. Network/DNS errors surface here too.
 
 **Piping JSON output to another tool and getting a parse error**
-Make sure you're only capturing stdout — informational messages (like
-"Using config file: ...") are written to stderr, but redirecting both
-streams together (e.g. `2>&1`) will still mix them.
+Make sure you're only capturing stdout — informational messages (e.g.
+`--verbose`'s "Using config file: ...", or the "Resolved alias ..." note)
+are written to stderr, but redirecting both streams together (e.g.
+`2>&1`) will still mix them.
