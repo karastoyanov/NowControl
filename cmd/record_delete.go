@@ -22,7 +22,7 @@ This is a destructive, irreversible operation. Prompts for confirmation
 unless --yes is passed.`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		table, sysID := args[0], args[1]
+		table, sysID := resolveTable(args[0]), args[1]
 		if sysID == "" {
 			return fmt.Errorf("sys_id must not be empty")
 		}

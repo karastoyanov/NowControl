@@ -29,7 +29,7 @@ Use --format/--output to export the record as csv, xml, or xlsx instead of
 printing JSON to stdout.`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		table, sysID := args[0], args[1]
+		table, sysID := resolveTable(args[0]), args[1]
 		if sysID == "" {
 			return fmt.Errorf("sys_id must not be empty")
 		}

@@ -30,7 +30,7 @@ Supply fields with --field key=value (repeatable), --data '<json>', and/or
 earlier ones in this order: --file, then --data, then --field.`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		table, sysID := args[0], args[1]
+		table, sysID := resolveTable(args[0]), args[1]
 		if sysID == "" {
 			return fmt.Errorf("sys_id must not be empty")
 		}

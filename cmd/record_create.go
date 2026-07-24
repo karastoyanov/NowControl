@@ -29,7 +29,7 @@ Supply fields with --field key=value (repeatable), --data '<json>', and/or
 earlier ones in this order: --file, then --data, then --field.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		table := args[0]
+		table := resolveTable(args[0])
 
 		fields, err := resolveFields(recordCreateData, recordCreateFile, recordCreateFields)
 		if err != nil {

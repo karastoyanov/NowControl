@@ -31,7 +31,7 @@ Use --format/--output to export results as csv, xml, or xlsx instead of
 printing JSON to stdout.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		table := args[0]
+		table := resolveTable(args[0])
 
 		c, err := newClient()
 		if err != nil {
