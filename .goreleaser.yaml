@@ -83,7 +83,7 @@ brews:
     repository:
       owner: karastoyanov
       name: NowControl
-      branch: homebrew
+      branch: master
       token: "{{ .Env.GITHUB_TOKEN }}"
     directory: Formula
     commit_author:

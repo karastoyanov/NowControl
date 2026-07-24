@@ -24,6 +24,7 @@ all from the terminal, on Windows, Linux, and macOS.
 
 ```bash
 brew tap karastoyanov/nowctl https://github.com/karastoyanov/NowControl
+brew trust karastoyanov/nowctl   # required by Homebrew's tap-trust security feature; see docs.brew.sh/Tap-Trust
 brew install nowctl
 
 # to update later:
