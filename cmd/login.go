@@ -9,7 +9,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/karastoyanov/nowcontrol/internal/auth"
 	"github.com/karastoyanov/nowcontrol/internal/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,8 +20,8 @@ var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Authenticate against a ServiceNow instance and store credentials",
 	Long: `Prompts for a password, verifies it against the ServiceNow instance,
-and stores it securely in the OS credential store (Keychain on macOS,
-Credential Manager on Windows, Secret Service on Linux).`,
+and stores it in the config file (default $HOME/.nowctl.yaml), which is
+locked down to owner-only read/write permissions (0600).`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		instance := viper.GetString("instance")
 		username := viper.GetString("username")
@@ -44,18 +43,14 @@ Credential Manager on Windows, Secret Service on Linux).`,
 			return fmt.Errorf("could not authenticate against %s: %w", instance, err)
 		}
 
-		if err := auth.SetPassword(instance, username, password); err != nil {
+		viper.Set("instance", instance)
+		viper.Set("username", username)
+
+		if err := storeCredential(instance, username, password); err != nil {
 			return fmt.Errorf("storing credentials: %w", err)
 		}
 
-		viper.Set("instance", instance)
-		viper.Set("username", username)
-		configPath := configFilePath()
-		if err := viper.WriteConfigAs(configPath); err != nil {
-			return fmt.Errorf("saving %s: %w", configPath, err)
-		}
-
-		fmt.Printf("Logged in to %s as %s (saved to %s)\n", instance, username, configPath)
+		fmt.Printf("Logged in to %s as %s (saved to %s)\n", instance, username, configFilePath())
 		return nil
 	},
 }

@@ -12,8 +12,8 @@ var authCmd = &cobra.Command{
 	Use:   "auth",
 	Short: "Manage ServiceNow authentication",
 	Long: `Commands for authenticating against a ServiceNow instance and managing
-credentials stored in the OS credential store (Keychain on macOS,
-Credential Manager on Windows, Secret Service on Linux).`,
+credentials stored in the config file (default $HOME/.nowctl.yaml),
+which is locked down to owner-only read/write permissions (0600).`,
 }
 
 func init() {

@@ -12,7 +12,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	verbose bool
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -22,9 +25,9 @@ var rootCmd = &cobra.Command{
 table records, fetch and create individual records, and manage
 authentication against a ServiceNow instance.
 
-Run "nowctl auth login" once to verify and store credentials; the
-instance and username are then remembered in the config file and the
-password in the OS credential store, so other commands need no flags.
+Run "nowctl auth login" once to verify and store credentials; instance,
+username, and password are then remembered in the config file, so other
+commands need no flags.
 
 Instance and username are resolved in order: --instance/--username
 flags, NOWCTL_INSTANCE/NOWCTL_USERNAME env vars, the config file
@@ -47,9 +50,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.nowctl.yaml)")
 	rootCmd.PersistentFlags().String("instance", "", "ServiceNow instance URL")
 	rootCmd.PersistentFlags().String("username", "", "ServiceNow username")
+	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "print extra diagnostic info (e.g. which config file is used)")
 
 	viper.BindPFlag("instance", rootCmd.PersistentFlags().Lookup("instance"))
 	viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
+
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 }
 
 func initConfig() {
@@ -66,7 +72,7 @@ func initConfig() {
 	viper.SetEnvPrefix("NOWCTL")
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err == nil {
+	if err := viper.ReadInConfig(); err == nil && verbose {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }

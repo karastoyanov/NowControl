@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/karastoyanov/nowcontrol/internal/auth"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,7 +25,7 @@ var logoutCmd = &cobra.Command{
 			return fmt.Errorf("missing --username (or set it in config/env)")
 		}
 
-		if err := auth.DeletePassword(instance, username); err != nil {
+		if err := deleteCredential(instance, username); err != nil {
 			return fmt.Errorf("removing credentials: %w", err)
 		}
 
