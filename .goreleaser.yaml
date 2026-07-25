@@ -61,13 +61,18 @@ release:
   header: |
     ## nowctl v{{ .Version }}
 
-    Small cosmetic fix -- no functional CLI changes.
-
-    **Changed:**
-    - `--version` output simplified: drops the commit hash and reformats
-      the build date from RFC3339 to `dd-MM-yyyy`, e.g.
-      `nowctl version {{ .Version }} (built 25-07-2026)` instead of
-      `nowctl version {{ .Version }} (commit abc1234..., built 2026-07-25T10:00:00Z)`.
+    **New:**
+    - `table describe <table>` -- lists a table's fields via
+      `sys_dictionary`, including fields inherited from parent tables in
+      the class hierarchy (e.g. `incident` inherits `number`,
+      `short_description`, `state`, etc. from `task`). Field types and
+      reference targets are shown as display values (e.g. "Reference",
+      "Configuration Item"). Supports `--format`/`--output` like
+      `table list`.
+    - `nowctl doctor` -- checks the config file (exists? permissions
+      `0600`?), resolved instance/username, whether a password is
+      stored, and live authentication against the instance, printing an
+      `OK`/`FAIL` line per check and exiting non-zero if anything failed.
   footer: |
     ---
     Full usage reference: [docs/USAGE.md](https://github.com/karastoyanov/NowControl/blob/v{{ .Version }}/docs/USAGE.md)
